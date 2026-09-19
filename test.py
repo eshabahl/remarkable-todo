@@ -9,7 +9,8 @@ for block in read_blocks(f):
         if block.item.value is not None:
             points = []
             for p in block.item.value.points:
-                points.append((p.x, p.y))
+                # x is 0 in the middle of the page, not the left side
+                points.append((p.x + 702, p.y))
             strokes.append(points)
 
 print(len(strokes), "strokes")
