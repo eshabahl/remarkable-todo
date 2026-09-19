@@ -1,5 +1,6 @@
 from rmscene import read_blocks, SceneLineItemBlock
 from PIL import Image, ImageDraw
+from ocrmac import ocrmac
 
 f = open("test_pages/page1.rm", "rb")
 strokes = []
@@ -20,3 +21,6 @@ draw = ImageDraw.Draw(img)
 for s in strokes:
     draw.line(s, fill="black", width=4)
 img.save("page.png")
+
+result = ocrmac.OCR("page.png").recognize()
+print(result)
