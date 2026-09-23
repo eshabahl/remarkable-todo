@@ -1,11 +1,12 @@
 from rmscene import read_blocks, SceneLineItemBlock
 from PIL import Image, ImageDraw
 
-# from the Checklist template file
-FIRST_ROW = 257
+# y numbers from the Checklist template file (the 257 one was for the phone app)
+# box x I measured from check.png
+FIRST_ROW = 270
 ROW_H = 97.4
-BOX_LEFT = 80
-BOX_RIGHT = 135
+BOX_LEFT = 85
+BOX_RIGHT = 140
 
 f = open("test_pages/page1.rm", "rb")
 page = Image.new("RGB", (1404, 1872), "white")
