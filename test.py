@@ -89,5 +89,7 @@ for row in sorted(rows):
     for s in rows[row]:
         if is_tick(s, row) or is_strike(s):
             done = True
-    if len(text) > 0:
-        print(row, text[0], done)
+    # vision sometimes splits a row into pieces
+    text = " ".join(text)
+    if text != "":
+        print(row, text, done)
