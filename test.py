@@ -45,6 +45,11 @@ def is_tick(stroke, row):
     return BOX_LEFT < x < BOX_RIGHT and top < y < top + BOX_H
 
 
+def is_strike(stroke):
+    xs = [p[0] for p in stroke]
+    return max(xs) - min(xs) > 300
+
+
 f = open("test_pages/after.rm", "rb")
 strokes = []
 for block in read_blocks(f):
@@ -82,7 +87,7 @@ for row in sorted(rows):
     text = read_text("row.png")
     done = False
     for s in rows[row]:
-        if is_tick(s, row):
+        if is_tick(s, row) or is_strike(s):
             done = True
     if len(text) > 0:
         print(row, text[0], done)
