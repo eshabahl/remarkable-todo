@@ -3,6 +3,11 @@ from PIL import Image, ImageDraw
 import Vision
 from Foundation import NSURL
 
+# Checklist template, numbers from the template file
+FIRST_ROW = 270
+ROW_H = 97.4
+
+
 # ocrmac just froze. vision's language correction waits for a download that
 # never finishes on my mac and ocrmac cant turn it off, so this is ocrmac's
 # code (ocrmac.py on github) with language correction off
@@ -32,10 +37,26 @@ for block in read_blocks(f):
 
 print(len(strokes), "strokes")
 
-img = Image.new("RGB", (1404, 1872), "white")
-draw = ImageDraw.Draw(img)
+# put each stroke in a row using the middle of the stroke
+rows = {}
 for s in strokes:
-    draw.line(s, fill="black", width=4)
-img.save("page.png")
+    ys = [p[1] for p in s]
+    middle = (min(ys) + max(ys)) / 2
+    row = int((middle - FIRST_ROW) / ROW_H)
+    if row not in rows:
+        rows[row] = []
+    rows[row].append(s)
 
-print(read_text("page.png"))
+for row in sorted(rows):
+    img = Image.new("RGB", (1404, 140), "white")
+    draw = ImageDraw.Draw(img)
+    top = FIRST_ROW + row * ROW_H - 60
+    for s in rows[row]:
+        moved = []
+        for x, y in s:
+            moved.append((x, y - top))
+        draw.line(moved, fill="black", width=4)
+    img.save("row.png")
+    text = read_text("row.png")
+    if len(text) > 0:
+        print(row, text[0])
