@@ -23,6 +23,13 @@ def read_text(path):
     return results
 
 
+def row_number(y):
+    # the date at the top is above the first row
+    if y < FIRST_ROW - 42:
+        return None
+    return int((y - FIRST_ROW + 42) / ROW_H)
+
+
 f = open("test_pages/page1.rm", "rb")
 strokes = []
 for block in read_blocks(f):
@@ -37,26 +44,25 @@ for block in read_blocks(f):
 
 print(len(strokes), "strokes")
 
+page = Image.new("RGB", (1404, 1872), "white")
+draw = ImageDraw.Draw(page)
+for s in strokes:
+    draw.line(s, fill="black", width=4)
+
 # put each stroke in a row using the middle of the stroke
 rows = {}
 for s in strokes:
     ys = [p[1] for p in s]
-    middle = (min(ys) + max(ys)) / 2
-    row = int((middle - FIRST_ROW) / ROW_H)
+    row = row_number((min(ys) + max(ys)) / 2)
+    if row is None:
+        continue
     if row not in rows:
         rows[row] = []
     rows[row].append(s)
 
 for row in sorted(rows):
-    img = Image.new("RGB", (1404, 140), "white")
-    draw = ImageDraw.Draw(img)
-    top = FIRST_ROW + row * ROW_H - 60
-    for s in rows[row]:
-        moved = []
-        for x, y in s:
-            moved.append((x, y - top))
-        draw.line(moved, fill="black", width=4)
-    img.save("row.png")
+    top = int(FIRST_ROW + row * ROW_H - 42)
+    page.crop((0, top, 1404, top + 127)).save("row.png")
     text = read_text("row.png")
     if len(text) > 0:
         print(row, text[0])
