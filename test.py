@@ -6,6 +6,9 @@ from Foundation import NSURL
 # Checklist template, numbers from the template file
 FIRST_ROW = 270
 ROW_H = 97.4
+BOX_LEFT = 85
+BOX_RIGHT = 140
+BOX_H = 55
 
 
 # ocrmac just froze. vision's language correction waits for a download that
@@ -30,7 +33,19 @@ def row_number(y):
     return int((y - FIRST_ROW + 42) / ROW_H)
 
 
-f = open("test_pages/page1.rm", "rb")
+def middle(stroke):
+    xs = [p[0] for p in stroke]
+    ys = [p[1] for p in stroke]
+    return (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+
+
+def is_tick(stroke, row):
+    x, y = middle(stroke)
+    top = FIRST_ROW + row * ROW_H
+    return BOX_LEFT < x < BOX_RIGHT and top < y < top + BOX_H
+
+
+f = open("test_pages/after.rm", "rb")
 strokes = []
 for block in read_blocks(f):
     if isinstance(block, SceneLineItemBlock):
@@ -52,8 +67,8 @@ for s in strokes:
 # put each stroke in a row using the middle of the stroke
 rows = {}
 for s in strokes:
-    ys = [p[1] for p in s]
-    row = row_number((min(ys) + max(ys)) / 2)
+    x, y = middle(s)
+    row = row_number(y)
     if row is None:
         continue
     if row not in rows:
@@ -62,7 +77,12 @@ for s in strokes:
 
 for row in sorted(rows):
     top = int(FIRST_ROW + row * ROW_H - 42)
-    page.crop((0, top, 1404, top + 127)).save("row.png")
+    # start after the boxes, otherwise the tick gets read as a V
+    page.crop((150, top, 1404, top + 127)).save("row.png")
     text = read_text("row.png")
+    done = False
+    for s in rows[row]:
+        if is_tick(s, row):
+            done = True
     if len(text) > 0:
-        print(row, text[0])
+        print(row, text[0], done)
