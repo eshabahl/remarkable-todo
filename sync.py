@@ -6,7 +6,7 @@ page = utils.draw_page(strokes)
 rows = utils.find_rows(strokes)
 
 for row in sorted(rows):
-    text = utils.read_text(utils.row_image(page, row))
+    text = utils.read_text(utils.row_image(page, row)).strip(" -")
     if text == "":
         continue
     done = False

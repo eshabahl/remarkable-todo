@@ -13,3 +13,4 @@ for row in range(utils.ROWS):
     draw.text((20, top + 15), str(row), fill="red")
 
 page.save("check.png")
+print(len(strokes), "strokes, saved check.png")
