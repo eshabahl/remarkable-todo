@@ -1,28 +1,15 @@
-from rmscene import read_blocks, SceneLineItemBlock
-from PIL import Image, ImageDraw
+import sys
+from PIL import ImageDraw
+import utils
 
-# y numbers from the Checklist template file (the 257 one was for the phone app)
-# box x I measured from check.png
-FIRST_ROW = 270
-ROW_H = 97.4
-BOX_LEFT = 85
-BOX_RIGHT = 140
-
-f = open("test_pages/page1.rm", "rb")
-page = Image.new("RGB", (1404, 1872), "white")
+strokes = utils.read_strokes(sys.argv[1])
+page = utils.draw_page(strokes)
 draw = ImageDraw.Draw(page)
-for block in read_blocks(f):
-    if isinstance(block, SceneLineItemBlock):
-        if block.item.value is not None:
-            points = []
-            for p in block.item.value.points:
-                points.append((p.x + 702, p.y))
-            draw.line(points, fill="black", width=4)
 
-for row in range(16):
-    top = FIRST_ROW + row * ROW_H
-    draw.rectangle([BOX_LEFT, top, BOX_RIGHT, top + 55], outline="red")
-    draw.line([BOX_RIGHT + 70, top + 55, 1404, top + 55], fill="red")
+for row in range(utils.ROWS):
+    top = utils.FIRST_ROW + row * utils.ROW_H
+    draw.rectangle([utils.BOX_LEFT, top, utils.BOX_RIGHT, top + utils.BOX_H], outline="red")
+    draw.line([utils.BOX_RIGHT + 70, top + 55, utils.PAGE_W, top + 55], fill="red")
     draw.text((20, top + 15), str(row), fill="red")
 
 page.save("check.png")
