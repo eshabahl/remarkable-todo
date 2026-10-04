@@ -14,6 +14,11 @@ def add_task(text):
     return r.json()["id"]
 
 
+def close_task(task_id):
+    r = requests.post(TODOIST + "/tasks/" + task_id + "/close", headers=HEADERS)
+    r.raise_for_status()
+
+
 strokes = utils.read_strokes(sys.argv[1])
 page = utils.draw_page(strokes)
 rows = utils.find_rows(strokes)
@@ -37,11 +42,12 @@ for row in sorted(rows):
     # print(row, text, done)
     if text not in last:
         print("new:", text)
-        add_task(text)
-        last[text] = False
-    if done and not last[text]:
+        task_id = add_task(text)
+        last[text] = {"id": task_id, "done": False}
+    if done and not last[text]["done"]:
         print("done:", text)
-        last[text] = True
+        close_task(last[text]["id"])
+        last[text]["done"] = True
 
 f = open("last_sync.json", "w")
 json.dump(last, f, indent=2)
