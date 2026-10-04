@@ -33,21 +33,23 @@ else:
 
 for row in sorted(rows):
     text = utils.read_text(utils.row_image(page, row)).strip(" -")
-    if text == "":
-        continue
     done = False
     for s in rows[row]:
         if utils.is_tick(s, row) or utils.is_strike(s):
             done = True
     # print(row, text, done)
-    if text not in last:
+    # the same row gets read a bit differently every time (and a line through
+    # it changes the text) so use the row number, not the text
+    if row not in last:
+        if text == "":
+            continue
         print("new:", text)
         task_id = add_task(text)
-        last[text] = {"id": task_id, "done": False}
-    if done and not last[text]["done"]:
-        print("done:", text)
-        close_task(last[text]["id"])
-        last[text]["done"] = True
+        last[row] = {"text": text, "id": task_id, "done": False}
+    if done and not last[row]["done"]:
+        print("done:", last[row]["text"])
+        close_task(last[row]["id"])
+        last[row]["done"] = True
 
 f = open("last_sync.json", "w")
 json.dump(last, f, indent=2)
