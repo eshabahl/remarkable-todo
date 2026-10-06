@@ -40,16 +40,17 @@ for row in sorted(rows):
     # print(row, text, done)
     # the same row gets read a bit differently every time (and a line through
     # it changes the text) so use the row number, not the text
-    if row not in last:
+    key = str(row)  # json turns the keys into strings
+    if key not in last:
         if text == "":
             continue
         print("new:", text)
         task_id = add_task(text)
-        last[row] = {"text": text, "id": task_id, "done": False}
-    if done and not last[row]["done"]:
-        print("done:", last[row]["text"])
-        close_task(last[row]["id"])
-        last[row]["done"] = True
+        last[key] = {"text": text, "id": task_id, "done": False}
+    if done and not last[key]["done"]:
+        print("done:", last[key]["text"])
+        close_task(last[key]["id"])
+        last[key]["done"] = True
 
 f = open("last_sync.json", "w")
 json.dump(last, f, indent=2)
