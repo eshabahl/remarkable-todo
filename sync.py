@@ -5,7 +5,11 @@ import requests
 import utils
 
 TODOIST = "https://api.todoist.com/api/v1"
-HEADERS = {"Authorization": "Bearer " + os.environ["TODOIST_TOKEN"]}
+# was an environment variable but when the tablet runs this over ssh
+# .zshrc isn't loaded so it wasn't there. todoist_token.txt is in .gitignore
+f = open("todoist_token.txt")
+HEADERS = {"Authorization": "Bearer " + f.read().strip()}
+f.close()
 
 
 def add_task(text):
