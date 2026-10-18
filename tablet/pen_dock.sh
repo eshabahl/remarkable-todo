@@ -8,7 +8,11 @@ PAGE=e04c6a2d-913b-4f7e-b5d8-6c1a0f9e3b52
 FOLDER=/home/root/.local/share/remarkable/xochitl/$NOTEBOOK
 
 while true; do
-    # waits here until the sensor changes
+    # waits here until the sensor changes (pen in or out)
     dd if=/dev/input/event1 bs=24 count=1 > /dev/null 2>&1
-    scp $FOLDER/$PAGE.rm $MAC:remarkable-todo/pages/page.rm
+    # evtest exits with 10 if the pen is in the dock
+    evtest --query /dev/input/event1 EV_SW SW_PEN_INSERTED
+    if [ $? -eq 10 ]; then
+        scp $FOLDER/$PAGE.rm $MAC:remarkable-todo/pages/page.rm
+    fi
 done
