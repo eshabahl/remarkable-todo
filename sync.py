@@ -2,9 +2,15 @@ import sys
 import os
 import json
 import requests
+from datetime import datetime, timedelta, timezone
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 import utils
 
 TODOIST = "https://api.todoist.com/api/v1"
+SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 # was an environment variable but when the tablet runs this over ssh
 # .zshrc isn't loaded so it wasn't there. todoist_token.txt is in .gitignore
 f = open("todoist_token.txt")
@@ -23,6 +29,35 @@ def close_task(task_id):
     r.raise_for_status()
 
 
+# login part is from google's python quickstart
+def calendar_service():
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
+    return build("calendar", "v3", credentials=creds)
+
+
+def busy_today(service):
+    now = datetime.now(timezone.utc)
+    end = now + timedelta(days=1)
+    events = service.events().list(calendarId="primary", timeMin=now.isoformat(), timeMax=end.isoformat(),
+                                   singleEvents=True, orderBy="startTime").execute()
+    busy = []
+    for e in events.get("items", []):
+        start = datetime.fromisoformat(e["start"]["dateTime"])
+        finish = datetime.fromisoformat(e["end"]["dateTime"])
+        busy.append((start, finish))
+    return busy
+
+
 strokes = utils.read_strokes(sys.argv[1])
 page = utils.draw_page(strokes)
 rows = utils.find_rows(strokes)
@@ -34,6 +69,10 @@ if os.path.exists("last_sync.json"):
     f.close()
 else:
     last = {}
+
+service = calendar_service()
+busy = busy_today(service)
+print(len(busy), "events in the next 24 hours")
 
 for row in sorted(rows):
     text = utils.read_text(utils.row_image(page, row)).strip(" -")
