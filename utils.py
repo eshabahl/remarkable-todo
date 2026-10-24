@@ -104,7 +104,7 @@ def read_text(img):
 
 
 def next_free_slot(busy):
-    now = datetime.now()
+    now = datetime.now().astimezone()
     # start at the next half hour
     if now.minute < 30:
         slot = now.replace(minute=30, second=0, microsecond=0)
