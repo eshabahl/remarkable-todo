@@ -2,6 +2,7 @@ from rmscene import read_blocks, SceneLineItemBlock
 from PIL import Image, ImageDraw
 import Vision
 from Foundation import NSURL
+from datetime import datetime, timedelta
 
 # the page is 1404 x 1872
 PAGE_W = 1404
@@ -100,3 +101,21 @@ def read_text(img):
         results.append(r.text())
     # vision sometimes splits a row into pieces
     return " ".join(results)
+
+
+def next_free_slot(busy):
+    now = datetime.now()
+    # start at the next half hour
+    if now.minute < 30:
+        slot = now.replace(minute=30, second=0, microsecond=0)
+    else:
+        slot = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    while True:
+        end = slot + timedelta(minutes=30)
+        free = True
+        for start, finish in busy:
+            if slot < finish and end > start:
+                free = False
+        if free:
+            return slot
+        slot = end

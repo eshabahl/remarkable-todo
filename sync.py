@@ -10,7 +10,9 @@ from googleapiclient.discovery import build
 import utils
 
 TODOIST = "https://api.todoist.com/api/v1"
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+# was calendar.readonly from the quickstart, had to change it to add events
+# (and delete token.json so it asks again)
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 # was an environment variable but when the tablet runs this over ssh
 # .zshrc isn't loaded so it wasn't there. todoist_token.txt is in .gitignore
 f = open("todoist_token.txt")
@@ -58,6 +60,16 @@ def busy_today(service):
     return busy
 
 
+def block_time(service, text, start):
+    end = start + timedelta(minutes=30)
+    event = {
+        "summary": text,
+        "start": {"dateTime": start.isoformat()},
+        "end": {"dateTime": end.isoformat()},
+    }
+    service.events().insert(calendarId="primary", body=event).execute()
+
+
 strokes = utils.read_strokes(sys.argv[1])
 page = utils.draw_page(strokes)
 rows = utils.find_rows(strokes)
@@ -72,7 +84,6 @@ else:
 
 service = calendar_service()
 busy = busy_today(service)
-print(len(busy), "events in the next 24 hours")
 
 for row in sorted(rows):
     text = utils.read_text(utils.row_image(page, row)).strip(" -")
@@ -90,6 +101,9 @@ for row in sorted(rows):
         print("new:", text)
         task_id = add_task(text)
         last[key] = {"text": text, "id": task_id, "done": False}
+        slot = utils.next_free_slot(busy)
+        block_time(service, text, slot)
+        print("  at", slot.strftime("%I:%M %p"))
     if done and not last[key]["done"]:
         print("done:", last[key]["text"])
         close_task(last[key]["id"])
