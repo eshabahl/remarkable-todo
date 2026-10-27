@@ -54,6 +54,9 @@ def busy_today(service):
                                    singleEvents=True, orderBy="startTime").execute()
     busy = []
     for e in events.get("items", []):
+        # all day events only have a date, not a dateTime. skip them
+        if "dateTime" not in e["start"]:
+            continue
         start = datetime.fromisoformat(e["start"]["dateTime"])
         finish = datetime.fromisoformat(e["end"]["dateTime"])
         busy.append((start, finish))
