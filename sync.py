@@ -32,6 +32,8 @@ def close_task(task_id):
 
 
 # login part is from google's python quickstart
+# invalid_grant = delete token.json and run it once on the mac.
+# testing apps only get a 7 day login, published it in google cloud console
 def calendar_service():
     creds = None
     if os.path.exists("token.json"):
