@@ -28,3 +28,20 @@ python check.py test_pages/after.rm
 ```
 
 `test_pages/before.rm` is a page I wrote, `after.rm` is the same page after ticking one task, crossing one out and adding two more.
+
+## Setup
+
+Mac only (Vision is part of macOS).
+
+**Todoist:** put your API token (Settings > Integrations > Developer) in `todoist_token.txt`.
+
+**Google Calendar:** follow Google's Python quickstart for the Calendar API to make a project and download `credentials.json` into this folder. Then run `python sync.py test_pages/before.rm` once on the Mac, it opens the browser to log in and saves `token.json`. After that it works without the browser. Publish the app in the Google Cloud console (it can stay unverified), apps in "testing" mode have to log in again every 7 days.
+
+Careful, running sync.py on a test page creates real tasks and calendar events.
+
+**Mac:** turn on Remote Login (System Settings > General > Sharing). Keep the project in your home folder (`~/remarkable-todo`), not in Documents or Desktop, ssh can't open files there. Make an empty `pages` folder in it, that's where the tablet copies the page.
+
+**Tablet:** you need developer mode to get ssh into the tablet.
+1. On the tablet make a key with `dropbearkey -t ed25519 -f ~/.ssh/id_dropbear` and add the public key it prints to `~/.ssh/authorized_keys` on the Mac.
+2. In `tablet/pen_dock.sh` put your Mac's user and IP address, the notebook id and the page id (the folder and file names under `/home/root/.local/share/remarkable/xochitl/`).
+3. Copy it to the tablet and start it with `nohup sh pen_dock.sh &`
