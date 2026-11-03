@@ -51,3 +51,16 @@ Careful, running sync.py on a test page creates real tasks and calendar events.
 1. On the tablet make a key with `dropbearkey -t ed25519 -f ~/.ssh/id_dropbear` and add the public key it prints to `~/.ssh/authorized_keys` on the Mac.
 2. In `tablet/pen_dock.sh` put your Mac's user and IP address, the notebook id and the page id (the folder and file names under `/home/root/.local/share/remarkable/xochitl/`).
 3. Copy it to the tablet and start it with `nohup sh pen_dock.sh &`
+
+## Limits
+
+- Vision gets neat handwriting mostly right but struggles with messy or cursive writing. The text goes to Todoist the way it was read, so messy tasks show up with spelling mistakes ("Messy handerritting.")
+- Only one page, on the Checklist template. Writing above the first row is ignored but anything below the rows becomes a task.
+- Tasks are matched by row number. If I erase a task and write a different one on the same row it won't notice.
+- Every task gets 30 minutes, today only. It doesn't move things if I don't do them.
+- If the tablet restarts I have to start `pen_dock.sh` again.
+- If the Mac is asleep the page doesn't get copied, it catches up the next time I dock the pen.
+
+## Use of AI
+
+Generative AI was used to help find the pen dock sensor on the tablet, to figure out why ocrmac kept freezing and how to get around it, to understand the Todoist API docs, and to understand the output of the rmscene library. The idea, design and code are my own.
