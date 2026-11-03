@@ -18,6 +18,12 @@ So this reads the page when I put the pen back in its dock, and:
 
 `utils.py` has the functions for reading the page. `check.py` draws the template rows on top of a page, I used it a lot for debuging.
 
+## The pen dock
+
+Checking every few minutes would use battery and always be a bit behind. Putting the pen back means I'm done writing, so it syncs then.
+
+The dock has a magnet and a hall effect sensor that Linux reports as a switch called `SW_PEN_INSERTED` on `/dev/input/event1`. Reading that file with `dd` just waits until the sensor changes, so the script isn't doing anything in between. After every change `evtest --query` checks if the pen went in or came out.
+
 ## Try it
 
 ```
