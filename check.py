@@ -14,3 +14,15 @@ for row in range(utils.ROWS):
 
 page.save("check.png")
 print(len(strokes), "strokes, saved check.png")
+
+rows = utils.find_rows(strokes)
+for row in sorted(rows):
+    tick = False
+    strike = False
+    for s in rows[row]:
+        if utils.is_tick(s, row):
+            tick = True
+        if utils.is_strike(s):
+            strike = True
+    text = utils.read_text(utils.row_image(page, row))
+    print(row, len(rows[row]), "strokes", "tick" if tick else "", "strike" if strike else "", text)
