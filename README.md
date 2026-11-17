@@ -16,7 +16,7 @@ So this reads the page when I put the pen back in its dock, and:
 4. The rest of the row is cropped out of a picture of the page and read with Apple's Vision framework. It runs on the Mac, no API key needed.
 5. The rows are compared with `last_sync.json` (what the page looked like last time) so only new rows become tasks.
 
-`utils.py` has the functions for reading the page. `check.py` draws the template rows on top of a page and prints what it finds in each row, I used it a lot for debuging.
+`utils.py` has the functions for reading the page. `check.py` draws the template rows on top of a page and prints what it finds in each row, I used it a lot for debugging.
 
 ## The pen dock
 
