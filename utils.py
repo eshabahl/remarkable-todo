@@ -110,7 +110,8 @@ def next_free_slot(busy):
         slot = now.replace(minute=30, second=0, microsecond=0)
     else:
         slot = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-    while True:
+    # only today
+    while slot.date() == now.date():
         end = slot + timedelta(minutes=30)
         free = True
         for start, finish in busy:
@@ -119,3 +120,4 @@ def next_free_slot(busy):
         if free:
             return slot
         slot = end
+    return None

@@ -107,10 +107,13 @@ for row in sorted(rows):
         task_id = add_task(text)
         last[key] = {"text": text, "id": task_id, "done": False}
         slot = utils.next_free_slot(busy)
-        block_time(service, text, slot)
-        # so the next new task doesn't get the same time
-        busy.append((slot, slot + timedelta(minutes=30)))
-        print("  at", slot.strftime("%I:%M %p"))
+        if slot is None:
+            print("  no time left today")
+        else:
+            block_time(service, text, slot)
+            # so the next new task doesn't get the same time
+            busy.append((slot, slot + timedelta(minutes=30)))
+            print("  at", slot.strftime("%I:%M %p"))
     if done and not last[key]["done"]:
         print("done:", last[key]["text"])
         close_task(last[key]["id"])
